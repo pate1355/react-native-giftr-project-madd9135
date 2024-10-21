@@ -1,0 +1,18 @@
+{
+  "assets": [
+    {
+      "assetId": null,
+      "base64": null,
+      "duration": null,
+      "exif": null,
+      "fileName": null,
+      "fileSize": 4827541,
+      "height": 3025,
+      "mimeType": "image/jpeg",
+      "type": "image",
+      "uri": "file:///var/mobile/Containers/Data/Application/4DACAD57-4918-4041-9CFA-AE8E264BBDA2/Library/Caches/ExponentExperienceData/@anonymous/Giftr_React_Native-2663076d-300d-443a-ae2d-a531b566f2d1/ImagePicker/0E3F53D9-3F8C-4A4F-ADB8-7FD7B39ECFA1.jpg",
+      "width": 3024
+    }
+  ],
+  "canceled": false
+}

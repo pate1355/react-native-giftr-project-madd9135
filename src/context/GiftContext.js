@@ -58,7 +58,7 @@ export const GiftProvider = ({ children }) => {
     }
   };
 
-  const addIdea = async (personId, text, imgUrl, width, height) => {
+  const addIdea = async (personId, text, imgUrl, width = 500, height = 500) => {
     try {
       const person = people.find((person) => person.id === personId);
       const newIdea = {

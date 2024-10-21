@@ -1,7 +1,7 @@
 // Dependencies
 import React, { useContext } from "react";
 import { StatusBar } from "expo-status-bar";
-import { StyleSheet, Text, View, Button, Image } from "react-native";
+import { StyleSheet, Text, View, Button, Image, FlatList } from "react-native";
 
 // Context
 import GiftContext from "../context/GiftContext";
@@ -13,14 +13,17 @@ export default function IdeaPage({ navigation, route }) {
   const person = people.find((p) => p.id === personId);
 
   const renderIdea = ({ item }) => (
-    <View style={{ padding: 20 }}>
-      <Image source={{ uri: item.img }} />
-      <Text>{item.text}</Text>
-      <Button
-        title="Delete Idea"
-        onPress={() => deleteIdea(personId, item.id)}
-      />
-    </View>
+    console.log("item", item),
+    (
+      <View style={{ padding: 20 }}>
+        <Image source={{ uri: item.img }} style={{ width: 100, height: 150 }} />
+        <Text>{item.text}</Text>
+        <Button
+          title="Delete Idea"
+          onPress={() => deleteIdea(personId, item.id)}
+        />
+      </View>
+    )
   );
 
   return (

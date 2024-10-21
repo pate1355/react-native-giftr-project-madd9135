@@ -8,7 +8,6 @@ import {
   Button,
   Image,
   Modal,
-  TouchableOpacity,
   Text,
 } from "react-native";
 import GiftContext from "../context/GiftContext";
@@ -26,92 +25,95 @@ export default function AddIdeaPage({ navigation, route }) {
   const [cameraVisible, setCameraVisible] = useState(null);
   const [pickPermission, setPickPermission] = useState(null);
 
+  // Camera permission request
   const askForCameraPermission = async () => {
     try {
       const { status } = await Camera.requestCameraPermissionsAsync();
-      if (status === "granted") {
-        setCameraVisible(true);
-      }
+      setCameraVisible(status === "granted");
     } catch (error) {
       alert("Something went wrong requesting camera permission");
       console.log("error", error);
     }
   };
 
+  // Media library permission request
   const askForPickPermission = async () => {
     try {
       const { status } =
         await ImagePicker.requestMediaLibraryPermissionsAsync();
-      console.log("status", status);
-
-      if (status === "granted") {
-        setPickPermission(true);
-      }
+      setPickPermission(status === "granted");
     } catch (error) {
       alert("Something went wrong requesting gallery permission");
       console.log("error", error);
     }
   };
 
+  // Choose image from gallery
   const chooseImgFromGallery = async () => {
     console.log("chooseImgFromGallery");
 
-    try {
-      await askForPickPermission();
+    // if (pickPermission === null) {
+    //   await askForPickPermission();
+    // }
 
-      if (pickPermission) {
-        let image = await ImagePicker.launchImageLibraryAsync({
-          mediaTypes: ImagePicker.MediaTypeOptions.Images,
-          allowsEditing: true,
-          aspect: [4, 3],
-          quality: 1,
-        });
-        if (!image.canceled) {
-          setImg(image.uri);
-          setModalVisible(false);
-        }
-      }
-      //   else {
-      //     alert("Gallery permission denied");
-      //     setCameraVisible(false);
-      //     const { status } = await Camera.requestCameraPermissionsAsync();
-      //     if (status === "granted") {
-      //       setCameraVisible(true);
-      //     }
-      //   }
-    } catch (error) {
-      alert("Something went wrong requesting gallery permission");
-      console.log("error", error);
+    // if (!pickPermission) {
+    //   alert("Gallery permission is required to pick an image");
+    //   return;
+    // }
+
+    const askingPermission = await askForPickPermission();
+
+    let image = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    if (!image.canceled) {
+      setImg(image.assets[0].uri);
+      setPickPermission(null);
+      setModalVisible(false);
     }
   };
 
+  // Take image from camera
   const takeImgFromCamera = async () => {
-    try {
-      await askForCameraPermission();
-      if (cameraVisible) {
-        let image = await ImagePicker.launchCameraAsync({
-          allowsEditing: true,
-          aspect: [4, 3],
-          quality: 1,
+    // if (cameraVisible === null) {
+    //   await askForCameraPermission();
+    // }
+
+    // if (!cameraVisible) {
+    //   alert("Camera permission is required to take a photo");
+    //   return;
+    // }
+
+    const askingPermission = await askForCameraPermission();
+
+    let image = await ImagePicker.launchCameraAsync({
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    if (!image.canceled) {
+      const newUri = FileSystem.documentDirectory + "captured_image.jpg";
+      try {
+        await FileSystem.moveAsync({
+          from: image.assets[0].uri,
+          to: newUri,
         });
-        if (!image.canceled) {
-          const newUri = FileSystem.documentDirectory + "captured_image.jpg";
-          await FileSystem.moveAsync({
-            from: image.uri,
-            to: newUri,
-          });
-          setImg(image.uri);
-          setCameraVisible(false);
-        }
-      } else {
-        setModalVisible(true);
+        setImg(newUri);
+        setCameraVisible(null);
+        setModalVisible(false);
+      } catch (error) {
+        alert("Failed to save the captured image.");
+        console.log("Error moving file: ", error);
       }
-    } catch (error) {
-      alert("Something went wrong requesting camera permission");
-      console.log("error", error);
     }
   };
 
+  // Save the idea with image and text
   const saveIdea = () => {
     if (text && imgUrl) {
       addIdea(personId, text, imgUrl);
@@ -179,5 +181,12 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     alignItems: "center",
     justifyContent: "center",
+  },
+  inputTxt: {
+    width: "80%",
+    padding: 10,
+    borderWidth: 1,
+    borderColor: "#ddd",
+    marginBottom: 20,
   },
 });
