@@ -85,7 +85,7 @@ export const GiftProvider = ({ children }) => {
     }
   };
 
-  const deletePerson = async (personId) => {
+  const deletePerson = async ({ personId }) => {
     try {
       const updatedPeople = people.filter((person) => person.id !== personId);
       setPeople(updatedPeople);

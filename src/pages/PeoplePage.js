@@ -1,5 +1,5 @@
 // Dependencies
-import React, { useContext, useState, useEffect } from "react";
+import React, { useContext, useState, useEffect, useRef } from "react";
 import { StatusBar } from "expo-status-bar";
 import {
   StyleSheet,
@@ -9,10 +9,13 @@ import {
   FlatList,
   TouchableOpacity,
   Image,
+  Animated,
 } from "react-native";
 import { Swipeable } from "react-native-gesture-handler";
 import * as Crypto from "expo-crypto";
 import SvgUri from "react-native-svg";
+import DeleteConfirmationModal from "../components/DeleteConfirmationModal";
+// import { SwipeableRef } from "../components/DeleteConfirmationModal";
 
 // Context
 import GiftContext from "../context/GiftContext";
@@ -31,22 +34,9 @@ export default function PeoplePage({ navigation }) {
   const sortedPeople = people.sort((a, b) => a.dob.localeCompare(b.dob));
   console.log("sortedPeople", sortedPeople);
 
-  // const renderPerson = ({ item, index }) => (
-  //   <TouchableOpacity
-  //     onPress={() => navigation.navigate("Idea", { personId: item.id })}
-  //   >
-  //     <View style={{ padding: 20 }}>
-  //       <Text>{index + 1}</Text>
-  //       <Text>{item.name}</Text>
-  //       <Text> {item.dob}</Text>
-  //       {/* //delete button */}
-  //       <Button title="Delete" onPress={() => deletePerson(item.id)} />
-  //     </View>
-  //   </TouchableOpacity>
-  // );
-
   const HorizontalCard = ({ item, index, navigation, deletePerson }) => {
     const [isGifPlaying, setIsGifPlaying] = useState(true);
+    const fadeAnim = useRef(new Animated.Value(0)).current;
 
     useEffect(() => {
       const timer = setTimeout(() => {
@@ -54,6 +44,18 @@ export default function PeoplePage({ navigation }) {
       }, 5000);
       return () => clearTimeout(timer);
     }, []);
+
+    //Animation for Image on Card
+    useEffect(() => {
+      if (!isGifPlaying) {
+        // Start the fade-in animation when the GIF stops playing
+        Animated.timing(fadeAnim, {
+          toValue: 1, // Fully visible
+          duration: 500, // 500ms duration
+          useNativeDriver: false,
+        }).start();
+      }
+    }, [isGifPlaying]);
 
     // Render right actions (slidable delete button)
     const renderRightActions = () => {
@@ -67,11 +69,13 @@ export default function PeoplePage({ navigation }) {
             marginVertical: 10,
           }}
         >
-          <Button
+          {/* <Button
             title="Delete"
             color="#fff"
             onPress={() => deletePerson(item.id)}
-          />
+          /> */}
+
+          <DeleteConfirmationModal person={item} deletePerson={deletePerson} />
         </View>
       );
     };
@@ -120,15 +124,18 @@ export default function PeoplePage({ navigation }) {
                   />
                 )}
                 {console.log("item.avatar", item.avatar)}
-                <SvgUri
-                  width={100}
-                  height={100}
-                  source={{
-                    uri: `https://api.multiavatar.com/${item.dob}.svg?apikey=hJpi5MZyI8P2Rv`,
-                  }}
-                  style={{ width: 100, height: 100 }} // Set your desired dimensions here
-                  // resizeMode="contain" // You can adjust this according to your needs
-                />
+
+                {!isGifPlaying && (
+                  <Animated.Image
+                    width={100}
+                    height={100}
+                    source={{
+                      uri: `https://api.multiavatar.com/${item.dob}.png?apikey=hJpi5MZyI8P2Rv`,
+                    }}
+                    style={{ width: 100, height: 100, opacity: fadeAnim }}
+                    resizeMode="contain"
+                  />
+                )}
               </View>
             </View>
           </View>
@@ -141,7 +148,6 @@ export default function PeoplePage({ navigation }) {
     <View style={people.length === 0 ? styles.container : { padding: 15 }}>
       {people.length === 0 ? (
         <View style={styles.noFoundView}>
-          {/* <Text style={styles.titleTxt}>People List</Text> */}
           <Image
             source={{
               uri: "https://i.postimg.cc/yY6R7sSP/quiz-ezgif-com-video-to-gif-converter.gif",
@@ -190,8 +196,6 @@ export const styles = StyleSheet.create({
   noFoundView: {
     margin: 10,
     padding: 30,
-    // borderWidth: 1,
-    // borderColor: "#777",
   },
   imgStyle: {
     marginTop: 25,

@@ -9,11 +9,15 @@ import {
   Image,
   Modal,
   Text,
+  TouchableOpacity,
 } from "react-native";
+
+// Context
 import GiftContext from "../context/GiftContext";
 import * as ImagePicker from "expo-image-picker";
 import * as FileSystem from "expo-file-system";
 import { Camera } from "expo-camera";
+const image = require("../../assets/No-Image-Placeholder.png");
 
 export default function AddIdeaPage({ navigation, route }) {
   const { personId } = route.params;
@@ -21,8 +25,6 @@ export default function AddIdeaPage({ navigation, route }) {
   const [text, setText] = useState("");
   const [imgUrl, setImg] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
-  const [cameraVisible, setCameraVisible] = useState(null);
-  const [pickPermission, setPickPermission] = useState(null);
 
   // Media library permission request
   const askForPickPermission = async () => {
@@ -58,7 +60,6 @@ export default function AddIdeaPage({ navigation, route }) {
 
     if (!image.canceled) {
       setImg(image.assets[0].uri);
-      setPickPermission(null);
       setModalVisible(false);
     }
   };
@@ -101,7 +102,6 @@ export default function AddIdeaPage({ navigation, route }) {
           to: newUri,
         });
         setImg(newUri);
-        setCameraVisible(null);
         setModalVisible(false);
       } catch (error) {
         alert("Failed to save the captured image.");
@@ -120,25 +120,20 @@ export default function AddIdeaPage({ navigation, route }) {
     }
   };
 
+  const goBack = () => {
+    navigation.goBack();
+  };
+
   return (
-    <View style={styles.container}>
+    <View style={styles.modifiedContainer}>
+      <Text style={styles.txt}>Idea title</Text>
       <TextInput
         style={styles.inputTxt}
         placeholder="Idea"
         value={text}
         onChangeText={setText}
+        maxLength={50}
       />
-
-      {imgUrl ? (
-        <Image
-          source={{ uri: imgUrl }}
-          style={{ width: 200, height: 200, marginBottom: 20 }}
-        />
-      ) : (
-        <Text>No Image Selected or Captured</Text>
-      )}
-
-      <Button title="Select Image" onPress={() => setModalVisible(true)} />
 
       <Modal
         visible={modalVisible}
@@ -165,7 +160,53 @@ export default function AddIdeaPage({ navigation, route }) {
         </View>
       </Modal>
 
-      <Button title="Save Idea" onPress={saveIdea} />
+      <View style={styles.addIdeaContainer}>
+        <View style={styles.img}>
+          {imgUrl ? (
+            <Image
+              source={{ uri: imgUrl }}
+              style={{ width: 200, height: 200, marginBottom: 20 }}
+            />
+          ) : (
+            <>
+              {/* <Text>No Image Selected or Captured</Text> */}
+              <Image source={image} style={{ width: 200, height: 200 }} />
+            </>
+          )}
+        </View>
+
+        <View style={styles.btn}>
+          {/* <Button title="Select Image" onPress={() => setModalVisible(true)} /> */}
+
+          <TouchableOpacity onPress={() => setModalVisible(true)}>
+            <Text style={[styles.btnText, styles.btnCancel]}>Select Image</Text>
+          </TouchableOpacity>
+
+          {imgUrl ? (
+            <>
+              <TouchableOpacity onPress={saveIdea}>
+                <Text style={[styles.btnText, styles.btnSave]}>Save Idea</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity onPress={goBack}>
+                <Text style={[styles.btnText, styles.btnCancel]}>Cancel</Text>
+              </TouchableOpacity>
+            </>
+          ) : (
+            <></>
+          )}
+
+          {!imgUrl ? (
+            <>
+              <TouchableOpacity onPress={goBack}>
+                <Text style={[styles.btnText, styles.btnCancel]}>Go Back</Text>
+              </TouchableOpacity>
+            </>
+          ) : (
+            <></>
+          )}
+        </View>
+      </View>
 
       <StatusBar style="auto" />
     </View>
@@ -180,10 +221,56 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   inputTxt: {
-    width: "80%",
+    width: "100%",
     padding: 10,
     borderWidth: 1,
     borderColor: "#ddd",
     marginBottom: 20,
+    marginTop: 10,
+  },
+  modifiedContainer: {
+    padding: 15,
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "center",
+    alignItems: "Flex-start",
+  },
+  addIdeaContainer: {
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    gap: 30,
+  },
+  btnCancel: {
+    color: "#5c5cfa",
+    backgroundColor: "#fff",
+    paddingTop: 10,
+    paddingBottom: 10,
+    paddingLeft: 20,
+    paddingRight: 20,
+    borderWidth: 1,
+    borderColor: "#5c5cfa",
+    textAlign: "center",
+  },
+  btnText: {
+    fontSize: 18,
+  },
+  btn: {
+    gap: 15,
+  },
+  btnSave: {
+    color: "#fff",
+    backgroundColor: "#5c5cfa",
+    paddingTop: 10,
+    paddingBottom: 10,
+    paddingLeft: 40,
+    paddingRight: 40,
+    borderRadius: 10,
+  },
+  txt: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "#444",
   },
 });
