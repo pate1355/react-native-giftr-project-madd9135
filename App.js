@@ -8,10 +8,10 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 
 //Pages
 import { GiftProvider } from "./src/context/GiftContext.js";
-import peoplePage from "./src/pages/PeoplePage.js";
-import addPersonPage from "./src/pages/AddPersonPage.js";
-import ideaPage from "./src/pages/IdeaPage.js";
-import addIdeaPage from "./src/pages/AddIdeaPage.js";
+import PeoplePage from "./src/pages/PeoplePage.js";
+import AddPersonPage from "./src/pages/AddPersonPage.js";
+import IdeaPage from "./src/pages/IdeaPage.js";
+import AddIdeaPage from "./src/pages/AddIdeaPage.js";
 
 //Navigation
 const Stack = createStackNavigator();
@@ -24,7 +24,7 @@ export default function App() {
           <Stack.Navigator initialRouteName="People">
             <Stack.Screen
               name="People"
-              component={peoplePage}
+              component={PeoplePage}
               options={({ navigation }) => ({
                 title: "People",
                 headerRight: () => (
@@ -37,10 +37,10 @@ export default function App() {
                 ),
               })}
             />
-            <Stack.Screen name="Add Person" component={addPersonPage} />
+            <Stack.Screen name="Add Person" component={AddPersonPage} />
             <Stack.Screen
               name="Idea"
-              component={ideaPage}
+              component={IdeaPage}
               options={({ navigation, route }) => ({
                 title: "Idea",
                 headerRight: () => (
@@ -57,7 +57,7 @@ export default function App() {
                 ),
               })}
             />
-            <Stack.Screen name="Add Idea" component={addIdeaPage} />
+            <Stack.Screen name="Add Idea" component={AddIdeaPage} />
           </Stack.Navigator>
         </NavigationContainer>
       </GiftProvider>

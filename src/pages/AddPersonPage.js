@@ -9,7 +9,7 @@ import {
 import DatePicker from "react-native-modern-datepicker";
 import GiftContext from "../context/GiftContext";
 
-export default function addPersonPage({ navigation }) {
+export default function AddPersonPage({ navigation }) {
   const { addPerson } = useContext(GiftContext);
   const [name, setName] = useState("");
   const [dob, setDob] = useState("");
