@@ -17,7 +17,6 @@ import { Camera } from "expo-camera";
 
 export default function AddIdeaPage({ navigation, route }) {
   const { personId } = route.params;
-  console.log("personId of Add Idea : ", personId);
   const { addIdea } = useContext(GiftContext);
   const [text, setText] = useState("");
   const [imgUrl, setImg] = useState("");
@@ -25,23 +24,15 @@ export default function AddIdeaPage({ navigation, route }) {
   const [cameraVisible, setCameraVisible] = useState(null);
   const [pickPermission, setPickPermission] = useState(null);
 
-  // Camera permission request
-  const askForCameraPermission = async () => {
-    try {
-      const { status } = await Camera.requestCameraPermissionsAsync();
-      setCameraVisible(status === "granted");
-    } catch (error) {
-      alert("Something went wrong requesting camera permission");
-      console.log("error", error);
-    }
-  };
-
   // Media library permission request
   const askForPickPermission = async () => {
     try {
       const { status } =
         await ImagePicker.requestMediaLibraryPermissionsAsync();
-      setPickPermission(status === "granted");
+      if (status !== "granted") {
+        setModalVisible(false);
+        return;
+      }
     } catch (error) {
       alert("Something went wrong requesting gallery permission");
       console.log("error", error);
@@ -50,18 +41,13 @@ export default function AddIdeaPage({ navigation, route }) {
 
   // Choose image from gallery
   const chooseImgFromGallery = async () => {
-    console.log("chooseImgFromGallery");
+    console.log("Inside chooseImgFromGallery Function");
 
-    // if (pickPermission === null) {
-    //   await askForPickPermission();
-    // }
-
-    // if (!pickPermission) {
-    //   alert("Gallery permission is required to pick an image");
-    //   return;
-    // }
+    console.log("Waiting for permission for gallery");
 
     const askingPermission = await askForPickPermission();
+
+    console.log("Permission granted for gallery");
 
     let image = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -77,18 +63,29 @@ export default function AddIdeaPage({ navigation, route }) {
     }
   };
 
+  // Camera permission request
+  const askForCameraPermission = async () => {
+    try {
+      const { status } = await Camera.requestCameraPermissionsAsync();
+      if (status !== "granted") {
+        setModalVisible(false);
+        return;
+      }
+    } catch (error) {
+      alert("Something went wrong requesting camera permission");
+      console.log("error", error);
+    }
+  };
+
   // Take image from camera
   const takeImgFromCamera = async () => {
-    // if (cameraVisible === null) {
-    //   await askForCameraPermission();
-    // }
+    console.log("Inside takeImgFromCamera Function");
 
-    // if (!cameraVisible) {
-    //   alert("Camera permission is required to take a photo");
-    //   return;
-    // }
+    console.log("Waiting for permission for camera");
 
     const askingPermission = await askForCameraPermission();
+
+    console.log("Permission granted for camera");
 
     let image = await ImagePicker.launchCameraAsync({
       allowsEditing: true,

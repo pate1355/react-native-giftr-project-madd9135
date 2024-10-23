@@ -1,12 +1,15 @@
 import React, { createContext, useState, useEffect } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Crypto from "expo-crypto";
+import axios from "axios";
 
 export const GiftContext = createContext();
 
 export const GiftProvider = ({ children }) => {
   const [people, setPeople] = useState([]);
   console.log(people);
+  const avatar = `https://api.multiavatar.com/${Crypto.randomUUID()}.svg?apikey=hJpi5MZyI8P2Rv`;
+  console.log("env", avatar);
 
   useEffect(() => {
     const fetchPeople = async () => {
@@ -32,6 +35,7 @@ export const GiftProvider = ({ children }) => {
         name,
         dob,
         ideas: [],
+        avatar: `https://api.multiavatar.com/${Crypto.randomUUID()}.png?apikey=hJpi5MZyI8P2Rv`,
       };
       const updatedPeople = [...people, newPerson];
       setPeople(updatedPeople);
@@ -81,8 +85,27 @@ export const GiftProvider = ({ children }) => {
     }
   };
 
+  const deletePerson = async (personId) => {
+    try {
+      const updatedPeople = people.filter((person) => person.id !== personId);
+      setPeople(updatedPeople);
+      await AsyncStorage.setItem("people", JSON.stringify(updatedPeople));
+    } catch (error) {
+      alert("Error deleting person");
+      console.log(error);
+    }
+  };
+
   return (
-    <GiftContext.Provider value={{ people, addPerson, deleteIdea, addIdea }}>
+    <GiftContext.Provider
+      value={{
+        people,
+        addPerson,
+        deleteIdea,
+        addIdea,
+        deletePerson,
+      }}
+    >
       {children}
     </GiftContext.Provider>
   );
